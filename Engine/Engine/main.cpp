@@ -57,28 +57,42 @@ int main ()
 	const float mass1 = 100.f;
 	const float mass2 = 100.f;
 
-	// Time step value (1/60 of second)
-	const float dt = 0.016f;
-
 	// Spring's variables
 	float initial_distance = (r2-r1).length ();
 	float k = 0.05f;
 
+	// Time step value (1/60 of second)
+	const float dt = 0.016f;
+	// Timer that measures delay
+	sf::Clock timer;
+	float total_delay = 0;
+
 	// Main cycle
 	while (window.isOpen ())
 		{
+		// Delay measurement
+		total_delay += timer.getElapsedTime ().asSeconds ();
+		timer.restart ();
+
 		// ------ Physics ------
-		FloatVector2D current_distance = (r2-r1);
+		if (total_delay > dt)
+			{
+			FloatVector2D current_distance = r2-r1;
 
-		//            Force = (                  direction               )   (                     dx                     ) * k
-		FloatVector2D Force = (current_distance/current_distance.length()) * (current_distance.length() - initial_distance) * k;
-		
-		// According to 3rd Newton's law
-		F1 = Force;
-		F2 = -Force;
+			//            Force = (                  direction               )   (                     dx                     ) * k
+			FloatVector2D Force = (current_distance/current_distance.length ()) * (current_distance.length () - initial_distance) * k;
 
-		updatePoint (r1, V1, F1, dt, mass1);
-		updatePoint (r2, V2, F2, dt, mass2);
+			// According to 3rd Newton's law
+			F1 = Force;
+			F2 = -Force;
+
+			updatePoint (r1, V1, F1, dt, mass1);
+			updatePoint (r2, V2, F2, dt, mass2);
+
+			
+
+			total_delay -= dt;
+			}
 
 		// ------ Graphics ------
 		window.clear ();
