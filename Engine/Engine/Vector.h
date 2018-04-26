@@ -74,7 +74,7 @@ template <typename dataType> class Vector
 			};
 
 		// Getters
-		dataType size ()
+		dataType length ()
 			{
 			return sqrt (x*x + y*y);
 			}

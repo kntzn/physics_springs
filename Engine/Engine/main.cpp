@@ -24,25 +24,41 @@ int main ()
 	
 	// Position radius-vectors
 	FloatVector2D r1 (100, 100);
-	FloatVector2D r2 (200, 200);
+	FloatVector2D r2 (100, 200);
 	// Velocity vectors
-	FloatVector2D V1 (10, 10);
-	FloatVector2D V2 (10, 5);
+	FloatVector2D V1 (10, 0);
+	FloatVector2D V2 (-10, 0);
 	// Force vectors
 	FloatVector2D F1 (0, 0);
 	FloatVector2D F2 (0, 0);
+	// Masses of the bodies
+	const float mass1 = 100.f;
+	const float mass2 = 100.f;
+
 	// Time step value (1/60 of second)
 	const float dt = 0.016f;
-	// Masses of the bodies
-	const float mass1 = 1.f;
-	const float mass2 = 1.f;
 
+	// Spring's variables
+	float initial_distance = (r2-r1).length ();
+	float k = 0.05f;
+
+	// Main cycle
 	while (window.isOpen ())
 		{
+		// ------ Physics ------
+		FloatVector2D current_distance = (r2-r1);
+
+		//            Force = (                  direction               )   (                     dx                     ) * k
+		FloatVector2D Force = (current_distance/current_distance.length()) * (current_distance.length() - initial_distance) * k;
 		
+		// According to 3rd Newton's law
+		F1 = Force;
+		F2 = -Force;
+
 		updatePoint (r1, V1, F1, dt, mass1);
 		updatePoint (r2, V2, F2, dt, mass2);
 
+		// ------ Graphics ------
 		window.clear ();
 		drawPoint (r1, window);
 		drawPoint (r2, window);
