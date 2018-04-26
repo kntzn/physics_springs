@@ -79,7 +79,7 @@ int main ()
 			{
 			FloatVector2D current_distance = r2-r1;
 
-			//            Force = (                  direction               )   (                     dx                     ) * k
+			//            Force = (                  direction                )   (                     dx                      ) * k
 			FloatVector2D Force = (current_distance/current_distance.length ()) * (current_distance.length () - initial_distance) * k;
 
 			// According to 3rd Newton's law
@@ -88,8 +88,6 @@ int main ()
 
 			updatePoint (r1, V1, F1, dt, mass1);
 			updatePoint (r2, V2, F2, dt, mass2);
-
-			
 
 			total_delay -= dt;
 			}
