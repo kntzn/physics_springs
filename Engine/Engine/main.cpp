@@ -2,6 +2,7 @@
 #include "Vector.h"
 
 typedef Vector <float> FloatVector2D;
+const float pi = 3.141596;
 
 void updatePoint (FloatVector2D &r, FloatVector2D &V, FloatVector2D &F, const float dt, const float mass)
 	{
@@ -13,8 +14,29 @@ void drawPoint (FloatVector2D r, sf::RenderWindow &window)
 	{ 
 	sf::CircleShape circle (30);
 	circle.setPosition (r.toSf ());
+	circle.setOrigin (circle.getRadius (), circle.getRadius ());
 
 	window.draw (circle);
+	}
+
+void drawSpring (FloatVector2D r1, FloatVector2D r2, sf::RenderWindow &window)
+	{ 
+	const float rect_length = 100;
+	sf::RectangleShape rect (sf::Vector2f (rect_length, 10));
+	rect.setOrigin (rect.getSize ()/2.f);
+	rect.setPosition ((r1+r2).toSf ()/2.f);
+
+	// Rotation
+	float angle = atan2f (r1.y-r2.y, r1.x-r2.x);
+	angle /= pi;
+	angle *= 180;
+	rect.setRotation (angle);
+
+	// Scaling
+	rect.scale ((r1-r2).length ()/rect_length, 1);
+
+	// Drawing
+	window.draw (rect);
 	}
 
 int main ()
@@ -62,6 +84,7 @@ int main ()
 		window.clear ();
 		drawPoint (r1, window);
 		drawPoint (r2, window);
+		drawSpring (r1, r2, window);
 		window.display ();
 		}
 
