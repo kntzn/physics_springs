@@ -74,6 +74,12 @@ int main ()
 		total_delay += timer.getElapsedTime ().asSeconds ();
 		timer.restart ();
 
+		// Events
+		sf::Event event;
+		while (window.pollEvent (event))
+			if (event.type == sf::Event::Closed)
+				window.close ();
+
 		// ------ Physics ------
 		if (total_delay > dt)
 			{
