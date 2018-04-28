@@ -48,23 +48,18 @@ int main ()
 	// Position radius-vectors
 	FloatVector2D r1 (300, 300);
 	FloatVector2D r2 (400, 400);
-	FloatVector2D r3 (500, 500);
 	// Velocity vectors
 	FloatVector2D V1 (10, 0);
 	FloatVector2D V2 (-10, 0);
-	FloatVector2D V3 (0, 10);
 	// Force vectors
 	FloatVector2D F1 (0, 0);
 	FloatVector2D F2 (0, 0);
-	FloatVector2D F3 (0, 0);
 	// Masses of the bodies
 	const float mass1 = 100.f;
 	const float mass2 = 100.f;
-	const float mass3 = 100.f;
-	
+
 	// Spring's variables
-	float initial_distance_2_3 = (r2-r3).length ();
-	float initial_distance_2_1 = (r2-r1).length ();
+	float initial_distance = (r2-r1).length ();
 	float k = 0.05f;
 
 	// Time step value (1/60 of second)
@@ -89,34 +84,26 @@ int main ()
 		// ------ Physics ------
 		if (total_delay > dt)
 			{
-			FloatVector2D current_distance_2_1 = r2-r1;
-			FloatVector2D current_distance_2_3 = r2-r3;
+			FloatVector2D current_distance = r2-r1;
 
-			//            Force     = (                      direction                    )   (                         dx                          ) * k
-			FloatVector2D Force_2_1 = (current_distance_2_1/current_distance_2_1.length ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
-			FloatVector2D Force_2_3 = (current_distance_2_3/current_distance_2_3.length ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
+			//            Force = (                  direction                )   (                     dx                      ) * k
+			FloatVector2D Force = (current_distance/current_distance.length ()) * (current_distance.length () - initial_distance) * k;
 
 			// According to 3rd Newton's law
-			F1 = Force_2_1;
-			F2 = -Force_2_1 - Force_2_3;
-			F3 = Force_2_3;
+			F1 = Force;
+			F2 = -Force;
 
 			updatePoint (r1, V1, F1, dt, mass1);
 			updatePoint (r2, V2, F2, dt, mass2);
-			updatePoint (r3, V3, F3, dt, mass3);
 
 			total_delay -= dt;
 			}
 
 		// ------ Graphics ------
 		window.clear ();
-
 		drawPoint (r1, window);
 		drawPoint (r2, window);
-		drawPoint (r3, window);
 		drawSpring (r1, r2, window);
-		drawSpring (r3, r2, window);
-		
 		window.display ();
 		}
 
