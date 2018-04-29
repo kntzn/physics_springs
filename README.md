@@ -164,7 +164,7 @@
 
 Исходя из значения *initial_distance* и длины вектора *current_distance*, можем посчитать долгожданное *dx*:
 
-    dx = current_distance.length () - current_distance;
+    dx = current_distance.length () - initial_distance;
     
 Дабы не усложнять код лишними переменными, подставим *dx* в [ранее указанную формулу](#chapter-4):
 
