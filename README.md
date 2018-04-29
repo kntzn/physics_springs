@@ -186,3 +186,117 @@
     F2 = -F1;
     или
     F2 = -Force;
+
+Таким образом новым кодом внутри главного цикла станет:
+
+    FloatVector2D current_distance = r2-r1;
+
+    FloatVector2D Force = (current_distance/current_distance.length ()) * (current_distance.length () - initial_distance) * k;
+
+    F1 = Force;
+    F2 = -Force;
+
+    updatePoint (r1, V1, F1, dt, mass1);
+    updatePoint (r2, V2, F2, dt, mass2);
+    
+Запустим код и взглянем на поведение тел (точек). Все прекрасно, только вот тела двигаются с дерганием, которое обусловлено привязкой к частоте ЦП. Чтобы от этого избавиться, сделаем привязку к реальному прошедшему времени. То есть, заведем объект типа *sf::Clock*, который будет замерять прошедшее время между прохождениями цикла. Там же заведем переменную *total_dely*, которая будут аккумулировать прошедшее время и опустошаться, если времени прошло больше, чем <b>dt</b>:
+
+    sf::Clock timer;
+    float total_delay = 0;
+
+    while (window.isOpen ())
+      {
+      total_delay += timer.getElapsedTime ().asSeconds ();
+      timer.restart ();
+      
+      while (total_delay > dt)
+          {
+          FloatVector2D current_distance = r2-r1;
+
+          FloatVector2D Force = (current_distance/current_distance.length ()) * (current_distance.length () - initial_distance) * k;
+
+          F1 = Force;
+          F2 = -Force;
+
+          updatePoint (r1, V1, F1, dt, mass1);
+          updatePoint (r2, V2, F2, dt, mass2);
+          
+          total_delay -= dt;
+          }
+      
+      window.clear ();
+      drawPoint (r1, window);
+      drawPoint (r2, window);
+      drawSpring (r1, r2, window);
+      window.display ();
+      }
+      
+Такая конструкция позволяет делать физические расчеты с постоянной величиной <b>dt</b> и с соответствием прошедшему времени. 
+
+Финальной частью создания свзяи станет визуализация пружины. Для этого мы создадим объект типа *sf::RectangleShape* посередине между телами, который будем растягивать по одной из осей до длины вектора <b>r2-r1</b>. После этого мы будем поворачивать этот прямоугольник так, чтобы концами он располагался в координатах тел:
+
+![spring_draw](https://github.com/kntzn/physics_springs/blob/master/img/spring_draw.png)
+
+Напишем соответствующую функцию *drawSpring*, рисующую толстую прямую между точками <b>r1</b> и <b>r2</b>:
+
+    void drawSpring (FloatVector2D r1, FloatVector2D r2, sf::RenderWindow &window)
+      { 
+      const float rect_length = 100;
+      sf::RectangleShape rect (sf::Vector2f (rect_length, 10));
+      rect.setOrigin (rect.getSize ()/2.f);
+      rect.setPosition ((r1+r2).toSf ()/2.f);
+      rect.setFillColor (sf::Color (127, 127, 127));
+
+      // Rotation
+      float angle = atan2f (r1.y-r2.y, r1.x-r2.x);
+      angle /= pi;
+      angle *= 180;
+      rect.setRotation (angle);
+
+      // Scaling
+      rect.scale ((r1-r2).length ()/rect_length, 1);
+
+      // Drawing
+      window.draw (rect);
+      }
+
+С полным кодом можно ознкомиться в папке [example2](https://github.com/kntzn/physics_springs/tree/master/example2)
+
+<a id="chapter-2"></a>
+## Обобщение для 3 тел
+Этот пункт является логическим продолжением предыдущего, а так же наглядным примером принципа *каждый с каждым*. То есть, каждое тело будет связано с любым другим. Поэтому, для начала, создадим третье тело и вторую пружину, чтобы получилась конструкция, напоминающая бусы: 
+
+![2_springs](https://github.com/kntzn/physics_springs/blob/master/img/2_springs.png)
+
+Соответственно, все параметры повторяются: создаем вектора <b>r3, V3, F3</b> для третьего тела. С пружиной чуть сложнее. Поскольку теперь уже не одна пара взаимодействует, а у каждой пружины будет своя собственная уникальная деформация, понадобится хранить не одну начальную дистанцию. Потому заведем две величины начальных дистанций:
+
+    float initial_distance_2_3 = (r2-r3).length ();
+    float initial_distance_2_1 = (r2-r1).length ();
+Соответственно, заведем два вектора *current_distance_1_2* и *current_distance_2_3*:
+
+    FloatVector2D current_distance_2_1 = r2-r1;
+    FloatVector2D current_distance_2_3 = r2-r3;
+    
+Так же, каждая пружина будет иметь свою собственную силу:
+
+    FloatVector2D Force_2_1 = (current_distance_2_1/current_distance_2_1.length ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
+    FloatVector2D Force_2_3 = (current_distance_2_3/current_distance_2_3.length ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
+
+Сложнее всего решить, к чему применять эти силы. Нужно очень внимательно следить, откуда и куда будут направлены вектора. Если внимательно проследить, за индексами тех переменных, которые мы ранее заводили, то можно заметить, что первая цифра отвечает за то, к какому телу направлена сила, а вторая - за то, к какому телу она применяется. Отсюда следует, что значения сил примут следующие значения:
+
+    F1 = Force_2_1;
+    F3 = Force_2_3;
+
+Вспомним третий закон Ньютона и приравняем силу, приложеную к телу номер 2, к сумме отрицательных значений сил F1 и F3;
+
+    F2 = -Force_2_1 - Force_2_3;
+    или
+    F2 = -F1 - F3;
+
+Подобно тому, как мы вводили третье тело, введем и третью пружину - создадим еще одну начальную дистанцию, вектор текущей дистанции <b>r1-r3</b> и вектор <b>Force_1_3</b>. Вычисления для них будут абсолютно аналогичны. Однако теперь на тела 1 и 3 будет действовать еще и сила <b>Force_1_3</b>. По аналогии с предыдущими парами, на тело 1 действует <b>-Force_1_3</b>, а на тело 2 действует <b>Force_1_3</b>. Таким образом, значения <b>F1</b>, <b>F2</b> и <b>F3</b> будут равны:
+
+    F1 =  Force_2_1 - Force_1_3;
+    F2 = -Force_2_1 - Force_2_3;
+    F3 =  Force_2_3 + Force_1_3;
+    
+     
