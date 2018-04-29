@@ -280,7 +280,7 @@
 Так же, каждая пружина будет иметь свою собственную силу:
 
     FloatVector2D Force_2_1 = (current_distance_2_1/current_distance_2_1.length ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
-    FloatVector2D Force_2_3 = (current_distance_2_3/current_distance.length_2_3 ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
+    FloatVector2D Force_2_3 = (current_distance_2_3/current_distance_2_3.length()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
 
 Сложнее всего решить, к чему применять эти силы. Нужно очень внимательно следить, откуда и куда будут направлены вектора. Если внимательно проследить, за индексами тех переменных, которые мы ранее заводили, то можно заметить, что первая цифра отвечает за то, к какому телу направлена сила, а вторая - за то, к какому телу она применяется. Отсюда следует, что значения сил примут следующие значения:
 
