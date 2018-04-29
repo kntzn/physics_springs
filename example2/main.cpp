@@ -82,7 +82,7 @@ int main ()
 				window.close ();
 
 		// ------ Physics ------
-		if (total_delay > dt)
+		while (total_delay > dt)
 			{
 			FloatVector2D current_distance = r2-r1;
 
