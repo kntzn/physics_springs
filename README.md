@@ -275,7 +275,7 @@
 Соответственно, заведем два вектора *current_distance_1_2* и *current_distance_2_3*:
 
     FloatVector2D current_distance_2_1 = r2-r1;
-	 FloatVector2D current_distance_2_3 = r2-r3;
+    FloatVector2D current_distance_2_3 = r2-r3;
     
 Так же, каждая пружина будет иметь свою собственную силу:
 
