@@ -80,7 +80,7 @@ template <typename dataType> class Vector
 			}
 		Vector dir ()
 			{
-			return Vector (x/size(), y/size());
+			return Vector (x/length(), y/length());
 			}
 		sf::Vector2f toSf ()
 			{
