@@ -4,11 +4,19 @@
 typedef Vector <float> FloatVector2D;
 const float pi = 3.141596;
 
-void updatePoint (FloatVector2D &r, FloatVector2D &V, FloatVector2D &F, const float dt, const float mass)
-	{
-	V += F/mass;
-	r += V*dt;
-	}
+void updatePoint (FloatVector2D &r, FloatVector2D &V, FloatVector2D &F, const double dt, const float mass)
+    {
+    if((F / mass).length() * dt > 10)
+        {
+        updatePoint(r, V, F, dt / 2, mass);
+        updatePoint(r, V, F, dt / 2, mass);
+        }
+    else
+        {
+        V += F/mass;
+        r += V*dt;
+        }
+    }
 
 void drawPoint (FloatVector2D r, sf::RenderWindow &window)
 	{ 
