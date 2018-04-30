@@ -68,10 +68,10 @@ int main ()
 	// Masses of the bodies
 	const float mass [n_bodies] = 
 		{
-		10, 
-		10, 
-		10,
-		10
+		100, 
+		100, 
+		100,
+		100
 		};
 	
 	// Springs' variables
