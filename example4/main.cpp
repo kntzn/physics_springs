@@ -22,7 +22,7 @@ void drawPoint (FloatVector2D r, sf::RenderWindow &window)
 	{ 
 	sf::CircleShape circle (30);
 	circle.setPosition (r.toSf ());
-	circle.setOrigin (circle.getRadius(), circle.getRadius());
+	circle.setOrigin (circle.getRadius (), circle.getRadius ());
 
 	window.draw (circle);
 	}
