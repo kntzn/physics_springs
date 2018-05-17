@@ -86,8 +86,8 @@ int main ()
 			{
 			FloatVector2D current_distance = r2-r1;
 
-			//            Force = (       direction       ) * (                     dx                      ) * k
-			FloatVector2D Force = (current_distance.dir ()) * (current_distance.length () - initial_distance) * k;
+			//            Force = (          direction          ) * (                     dx                      ) * k
+			FloatVector2D Force = (current_distance.normalize ()) * (current_distance.length () - initial_distance) * k;
 
 			// According to 3rd Newton's law
 			F1 = Force;

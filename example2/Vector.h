@@ -78,7 +78,7 @@ template <typename dataType> class Vector
 			{
 			return sqrt (x*x + y*y);
 			}
-		Vector dir ()
+		Vector normalize ()
 			{
 			return Vector (x/length(), y/length());
 			}

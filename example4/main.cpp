@@ -121,7 +121,7 @@ int main ()
 					{
 					FloatVector2D current_distance = r [j] - r [i];
 
-					FloatVector2D Force = (current_distance.dir()) * (current_distance.length () - initial_distance [j][i]) * k;
+					FloatVector2D Force = (current_distance.normalize ()) * (current_distance.length () - initial_distance [j][i]) * k;
 
 					F [i] +=  Force;
 					F [j] += -Force;
