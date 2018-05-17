@@ -94,10 +94,10 @@ int main ()
 			FloatVector2D current_distance_2_3 = r2-r3;
 			FloatVector2D current_distance_3_1 = r3-r1;
 
-			//            Force     = (                      direction                    )   (                         dx                          ) * k
-			FloatVector2D Force_2_1 = (current_distance_2_1/current_distance_2_1.length ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
-			FloatVector2D Force_2_3 = (current_distance_2_3/current_distance_2_3.length ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
-			FloatVector2D Force_3_1 = (current_distance_3_1/current_distance_3_1.length ()) * (current_distance_3_1.length () - initial_distance_3_1) * k;
+			//            Force     = (         direction         ) * (                         dx                          ) * k
+			FloatVector2D Force_2_1 = (current_distance_2_1.dir ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
+			FloatVector2D Force_2_3 = (current_distance_2_3.dir ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
+			FloatVector2D Force_3_1 = (current_distance_3_1.dir ()) * (current_distance_3_1.length () - initial_distance_3_1) * k;
 
 			// According to 3rd Newton's law
 			F1 =  Force_2_1 + Force_3_1;
