@@ -24,61 +24,62 @@ template <typename dataType> class Vector
 			}
 
 		// Operators overload
-		Vector operator+ (Vector const lvec)
+		Vector operator + (Vector const lvec)
 			{
 			return Vector (lvec.x + x, lvec.y + y);
 			};
-		Vector& Vector::operator+= (const Vector &lvec)
-			{
-			this->x += lvec.x;
-			this->y += lvec.y;
-			return *this;
-			};
-		Vector operator- (Vector const lvec)
+		Vector operator - (Vector const lvec)
 			{
 			return Vector (x - lvec.x, y - lvec.y);
 			};
-		Vector& Vector::operator-= (const Vector &lvec)
-			{
-			this->x -= lvec.x;
-			this->y -= lvec.y;
-			return *this;
-			};
-		dataType operator* (Vector const lvec)
+		dataType operator * (Vector const lvec)
 			{
 			return lvec.x*x + lvec.y*y;
 			}
-		Vector operator* (const dataType factor)
+		Vector operator * (const dataType factor)
 			{
 			return Vector (x*factor, y*factor);
 			};
-		Vector& Vector::operator*= (const dataType factor)
-			{
-			this->x *= factor;
-			this->y *= factor;
-			return *this;
-			};
-		Vector operator- ()
-			{
-			return Vector (-x, -y);
-			};
-		Vector operator/ (const float factor)
-			{
-			return Vector (x/factor, y/factor);
-			};
-		Vector& Vector::operator/= (const dataType factor)
-			{
-			this->x /= factor;
-			this->y /= factor;
-			return *this;
-			};
+        Vector operator - ()
+            {
+            return Vector (-x, -y);
+            };
+        Vector operator / (const dataType factor)
+            {
+            return Vector (x/factor, y/factor);
+            };
 
+        Vector& Vector::operator += (const Vector &lvec)
+            {
+            this->x += lvec.x;
+            this->y += lvec.y;
+            return *this;
+            };
+        Vector& Vector::operator -= (const Vector &lvec)
+            {
+            this->x -= lvec.x;
+            this->y -= lvec.y;
+            return *this;
+            };
+        Vector& Vector::operator *= (const dataType factor)
+            {
+            this->x *= factor;
+            this->y *= factor;
+            return *this;
+            };
+        Vector& Vector::operator /= (const dataType factor)
+            {
+            this->x /= factor;
+            this->y /= factor;
+            return *this;
+            };
+		
 		// Getters
 		dataType length ()
 			{
 			return sqrt (x*x + y*y);
 			}
-		Vector normalize ()
+		Vector dir ()
 			{
 			return Vector (x/length(), y/length());
 			}
