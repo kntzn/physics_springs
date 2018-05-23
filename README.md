@@ -1,6 +1,6 @@
 # Симуляция взаимодействия N тел, связанных пружинами
 ## Способ реализации: 
-Создание графической визуализации на языке C++ при помощи графической библиотеки SFML
+Моделирование системы на языке C++ с визуализацией при помощи графической библиотеки SFML
 ## План:
    * [Создание тела и симуляция его движения](#chapter-0)
    * [Создание связи между телами](#chapter-1)
@@ -152,16 +152,16 @@
 
     Force = (current_distance / current_distance.length ())*k*dx;
 
-Так же, будет удобно завести функцию *.dir ()* в объекте *Vector*, поскольку дважды писать название вектора будет неудобно. Она будет возвращать вектор, деленый на его длину:
+Так же, будет удобно завести функцию *normalize ()* в объекте *Vector*, поскольку дважды писать название вектора будет неудобно. Она будет возвращать вектор, деленый на его длину:
 
-    Vector dir ()
+    Vector normalize ()
       {
       return Vector (x/size(), y/size());
       }
 
 Пользуясь ей, мы существенно упростим код для восприятия:
 
-    Force = current_distance.dir ()*k*dx;
+    Force = current_distance.normalize ()*k*dx;
 
 Однако в этом равенстве по прежнему фигурирует *dx*, значение которого до сих пор неизвестно. Из школьной физики мы помним, что *dx* - растяжение пружины. С другой стороны, *dx* - разница расстояний, но между чем и чем? Давайте посмотрим:
 
@@ -179,7 +179,7 @@
     
 Дабы не усложнять код лишними переменными, подставим *dx* в [ранее указанную формулу](#chapter-4):
 
-    Force = current_distance.dir ()*(current_distance.length () - current_distance)*k;
+    Force = current_distance.normalize ()*(current_distance.length () - current_distance)*k;
 
 Вспомним, куда направлен вектор силы <b>Force</b>: он сонаправлен вектору <b>r2-r1</b>. Далее, определимся со знаком: представим, что пружина растянута. Тогда *dx* - положительная величина. При этом, пружина стремится стянуть два тела (сила будет действовать на первое тело в сторону второго). Тогда *Force* будет той силой, которая действует на тело 1, откуда следует логичное равнство:
 
@@ -199,7 +199,7 @@
 
     FloatVector2D current_distance = r2-r1;
 
-    FloatVector2D Force = current_distance.dir () * (current_distance.length () - initial_distance) * k;
+    FloatVector2D Force = current_distance.normalize () * (current_distance.length () - initial_distance) * k;
 
     F1 = Force;
     F2 = -Force;
@@ -221,7 +221,7 @@
           {
           FloatVector2D current_distance = r2-r1;
 
-          FloatVector2D Force = current_distance.dir () * (current_distance.length () - initial_distance) * k;
+          FloatVector2D Force = current_distance.normalize () * (current_distance.length () - initial_distance) * k;
 
           F1 = Force;
           F2 = -Force;
@@ -287,8 +287,8 @@
     
 Так же, каждая пружина будет иметь свою собственную силу:
 
-    FloatVector2D Force_2_1 = (current_distance_2_1.dir ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
-    FloatVector2D Force_2_3 = (current_distance_2_3.dir ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
+    FloatVector2D Force_2_1 = (current_distance_2_1.normalize ()) * (current_distance_2_1.length () - initial_distance_2_1) * k;
+    FloatVector2D Force_2_3 = (current_distance_2_3.normalize ()) * (current_distance_2_3.length () - initial_distance_2_3) * k;
 
 Сложнее всего решить, к чему применять эти силы. Нужно очень внимательно следить, откуда и куда будут направлены вектора. Если внимательно проследить, за индексами тех переменных, которые мы ранее заводили, то можно заметить, что первая цифра отвечает за то, к какому телу направлена сила, а вторая - за то, к какому телу она применяется. Отсюда следует, что значения сил примут следующие значения:
 
@@ -396,7 +396,7 @@
             {
             FloatVector2D current_distance = r [j] - r [i];
 
-            FloatVector2D Force = current_distance.dir () * (current_distance.length () - initial_distance [j][i]) * k;
+            FloatVector2D Force = current_distance.normalize () * (current_distance.length () - initial_distance [j][i]) * k;
 
             F [i] +=  Force;
             F [j] += -Force;
