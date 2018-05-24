@@ -2,20 +2,112 @@
 #include "Vector.h"
 
 typedef Vector <float> FloatVector2D;
-const float pi = 3.141596;
+#define pi 3.141592653589793238462643383279f
 
-void updatePoint (FloatVector2D &r, FloatVector2D &V, FloatVector2D &F, const double dt, const float mass)
+void drawPoint (FloatVector2D r, sf::RenderWindow &window);
+void drawSpring (FloatVector2D r1, FloatVector2D r2, sf::RenderWindow &window);
+
+struct MatPoint
     {
-    if ((F / mass).length () * dt > 10)
+    FloatVector2D r, V, F;
+    float m = 0;
+
+    MatPoint (FloatVector2D position, float mass)
         {
-        updatePoint (r, V, F, dt / 2, mass);
-        updatePoint (r, V, F, dt / 2, mass);
+        r = position;
+        m = mass;
         }
-    else
+
+    void updatePoint (const float dt);
+    };
+
+int main ()
+    {
+    // Main window
+    sf::RenderWindow window (sf::VideoMode (1600, 900), "");
+
+    // Number of bodies
+    const int n_bodies = 4;
+
+    // Position radius-vectors
+    MatPoint points [n_bodies] =
         {
-        V += F/mass;
-        r += V*dt;
+        MatPoint (FloatVector2D (200, 200), 100.f),
+        MatPoint (FloatVector2D (200, 400), 100.f),
+        MatPoint (FloatVector2D (400, 400), 100.f),
+        MatPoint (FloatVector2D (400, 200), 100.f)
+        };
+
+    points [3].V = FloatVector2D (30, 0);
+
+    // Springs' variables
+    float initial_distance [n_bodies] [n_bodies] = { };
+    float k = 5.f;
+
+    for (int i = 0; i < n_bodies; i++)
+        for (int j = 0; j < n_bodies; j++)
+            initial_distance [i] [j] = (points [i].r - points [j].r).length ();
+
+    // Time step value
+    float dt = 0.0016f;
+    // Timer that measures delay
+    sf::Clock timer;
+    float total_delay = 0;
+
+    // Main cycle
+    while (window.isOpen ())
+        {
+        // Delay measurement
+
+        //timer.restart ();
+
+        // Events
+        sf::Event event;
+        while (window.pollEvent (event))
+            if (event.type == sf::Event::Closed)
+                window.close ();
+
+        // ------ Physics ------
+
+        // Force vectors
+        for (int i = 0; i < n_bodies; i++)
+            for (int j = i+1; j < n_bodies && i != j; j++)
+                {
+                FloatVector2D current_distance = points [j].r - points [i].r;
+
+                FloatVector2D Force = current_distance.dir () * k *  (current_distance.length () - initial_distance [j] [i]);
+
+                points [i].F += Force;
+                points [j].F += -Force;
+                }
+
+        for (int i = 0; i < n_bodies; i++)
+            points [i].updatePoint (dt);
+
+
+        // ------ Graphics ------
+        window.clear ();
+
+        for (int i = 0; i < n_bodies; i++)
+            drawPoint (points [i].r, window);
+
+        for (int i = 0; i < n_bodies; i++)
+            for (int j = i+1; j < n_bodies; j++)
+                drawSpring (points [i].r, points [j].r, window);
+
+        window.display ();
         }
+
+    return 0;
+    }
+
+void MatPoint::updatePoint (const float dt)
+    {
+    V += F/m;
+    r += V*dt;
+
+    // Reseting the force
+    F = FloatVector2D (0, 0);
     }
 
 void drawPoint (FloatVector2D r, sf::RenderWindow &window)
@@ -26,7 +118,6 @@ void drawPoint (FloatVector2D r, sf::RenderWindow &window)
 
     window.draw (circle);
     }
-
 void drawSpring (FloatVector2D r1, FloatVector2D r2, sf::RenderWindow &window)
     {
     const float rect_length = 100;
@@ -46,106 +137,4 @@ void drawSpring (FloatVector2D r1, FloatVector2D r2, sf::RenderWindow &window)
 
     // Drawing
     window.draw (rect);
-    }
-
-int main ()
-    {
-    // Main window
-    sf::RenderWindow window (sf::VideoMode (1600, 900), "");
-
-    // Number of bodies
-    const int n_bodies = 4;
-
-    // Position radius-vectors
-    FloatVector2D r [n_bodies] =
-        {
-        FloatVector2D (200, 200),
-        FloatVector2D (200, 400),
-        FloatVector2D (400, 400),
-        FloatVector2D (400, 200)
-        };
-    // Velocity vectors
-    FloatVector2D V [n_bodies] =
-        {
-        FloatVector2D (30, 0),
-        FloatVector2D (0, 0),
-        FloatVector2D (0, 0),
-        FloatVector2D (0, 0)
-        };
-
-    // Masses of the bodies
-    const float mass [n_bodies] =
-        {
-        100,
-        100,
-        100,
-        100
-        };
-
-    // Springs' variables
-    float initial_distance [n_bodies] [n_bodies] = { };
-    float k = 5.f;
-
-    for (int i = 0; i < n_bodies; i++)
-        for (int j = 0; j < n_bodies; j++)
-            initial_distance [i] [j] = (r [i] - r [j]).length ();
-
-    // Time step value
-    const float dt = 0.016f;
-    // Timer that measures delay
-    sf::Clock timer;
-    float total_delay = 0;
-
-    // Main cycle
-    while (window.isOpen ())
-        {
-        // Delay measurement
-        total_delay += timer.getElapsedTime ().asSeconds ()*4.f;
-        timer.restart ();
-
-        // Events
-        sf::Event event;
-        while (window.pollEvent (event))
-            if (event.type == sf::Event::Closed)
-                window.close ();
-
-        // ------ Physics ------
-
-        // Force vectors
-        FloatVector2D F [n_bodies] = { };
-
-        while (total_delay > dt)
-            {
-            for (int i = 0; i < n_bodies; i++)
-                for (int j = i+1; j < n_bodies; j++)
-                    {
-                    FloatVector2D current_distance = r [j] - r [i];
-
-                    FloatVector2D Force = (current_distance.normalize ()) * (current_distance.length () - initial_distance [j] [i]) * k;
-
-                    F [i] += Force;
-                    F [j] += -Force;
-
-                    }
-
-            for (int i = 0; i < n_bodies; i++)
-                updatePoint (r [i], V [i], F [i], dt, mass [i]);
-
-            total_delay -= dt;
-            }
-
-        // ------ Graphics ------
-        window.clear ();
-
-        for (int i = 0; i < n_bodies; i++)
-            drawPoint (r [i], window);
-
-        for (int i = 0; i < n_bodies; i++)
-            for (int j = i+1; j < n_bodies; j++)
-                drawSpring (r [i], r [j], window);
-
-        window.display ();
-        }
-
-    return 0;
     }
