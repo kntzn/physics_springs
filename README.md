@@ -424,6 +424,40 @@
 
 ![n_springs](https://github.com/kntzn/physics_springs/blob/master/img/n_springs.png)
 
+Тем не менее, хранение всех переменных в массивах, хотя и упрощает код, но по-прежнему имеет слабую структурированность. Решеием этой проблемы будет хранение информацции о материальной точке в отдельной структуре *MatPoint*:
+
+    struct MatPoint
+      {
+      FloatVector2D r, V, F;
+      float m = 0;
+      
+      MatPoint (FloatVector2D position, float mass)
+        { 
+	r = position;
+	m = mass;
+	}
+	
+      void updatePoint (const float dt);
+      };
+      
+Соответственно, функция *updatePoint* станет методом структуры *MatPoint*:
+
+    void MatPoint::updatePoint (const float dt)
+      {
+      ...
+      
+Таким образом, в информацию об объекте *MatPoint* в фукнкцию *updatePoint* больше передавать не нужно.
+
+Так же, в связи с использованием структур, обращаться к параметрам наших материальных точек теперь нужно, как к объектам, принадлежащим к объекту *MatPoint*:
+
+    FloatVector2D current_distance = points [j].r - points [i].r;
+    ...
+    points [i].F +=  Force;
+    ...
+    drawPoint (points [i].r, window);
+    
+    И так далее
+
 С полным кодом, как и обычно, можно ознкомиться в папке [example4](https://github.com/kntzn/physics_springs/tree/master/example4)
 
 
